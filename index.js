@@ -7,27 +7,43 @@ const readlineSync = require('readline-sync')
 // We'll keep a global object to store usernames and password hashes
 let globalStore = {}
 
-
-
 /*
 * SOLUTION CODE FOR BCRYPT FUNCTIONS
 */
 
-// function for checking a password
-checkPassword = async (username, plaintextPassword) => {
-    // TODO: Make sure to delete this console.log once you're done implementing the function!
-    console.log('\n Uh-oh, checkPassword is not yet implemented. 😢')
+const hashPassword = async (username, password, saltRounds = 10) => {
+    try {
+      // Generate a salt
+      const salt = await bcrypt.genSalt(saltRounds)
+  
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, salt)
+  
+      // Add the user and password hash to the global store object
+      globalStore[username] = hashedPassword
+  
+      // Print a status update including the username and password hash
+      console.log(`\n✅ User ${username} created with hashed password: ${hashedPassword}\n`)
+    } catch (error) {
+      console.log(error)
+    }
+}
+  
+const checkPassword = async (username, plaintextPassword) => {
     // Ensure global store contains the user 
     // (this is a quick way to check if an object contains a key)
     if (globalStore[username]) {
-        // TODO: Use bcrypt's compare methof to compare a plaintext password to a password hash
-
-        // TODO: The result variable is a boolean. True means the user was valid. Take action accordingly.
+        // Use bcrypt's compare method to compare a plaintext password to a password hash
+        const result = await bcrypt.compare(plaintextPassword, globalStore[username])
+        
+        // The result variable is a boolean. True means the user was valid. Take action accordingly.
         if (result) {
-            // TODO: Display message for valid credentials
+            // Display message for valid credentials
+            console.log('\n✅ Login successful.\n')
         }
         else {
-            // TODO: Display message for invalid credentials
+            // Display message for invalid credentials
+            console.log('\n❌ Invalid username or password.\n')
         }
     }
     else {
@@ -35,21 +51,6 @@ checkPassword = async (username, plaintextPassword) => {
         console.log('\n❌ Sorry, but this user does not exist.\n')
     }
 }
-
-hashPassword = async (username, password) => {
-    // TODO: Make sure to delete this console.log once you're done implementing the function!
-    console.log('\nUh-oh, hashPassword is not yet implemented. 😢')
-
-    // TODO: Make the password hash using bcrypt
-
-    // TODO: Add the user and password hash to the global store object
-
-    // TODO: Print a status update including the username and password hash
-}
-
-
-
-
 
 /* 
 * CODE BELOW IS PROVIDED AND DOESN'T NEED TO BE ALTERED 
